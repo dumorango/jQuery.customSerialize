@@ -1,6 +1,6 @@
 function TextToString(){}
 TextToString.prototype.deserialize = function(e,val){
-  e.val(getText(val));
+	e.val(getText(val));
 }
 TextToString.prototype.serialize = function(e){
 	return e.val()
@@ -35,14 +35,14 @@ SelectToArray.prototype.serialize = function(e){
 function SelectToString(){}
 SelectToString.prototype.deserialize = function(e,val){
 	e.children().each(function(){
-		console.log("Option: value: "+$(this).val())
+		console.log("Option: value: "+val+" Element Value: "+$(this).val());
 		if($(this).val()==val) $(this).attr('selected','selected')
 	})
 }
 SelectToString.prototype.serialize = function(e){
 	var val;
 	e.children().each(function(){
-		if($(this).attr('selected')=='selected') val = $(this).val();return;
+		if($(this).attr('selected')=='selected'){ val = $(this).val();return;}
 	})
 	return val;
 }
@@ -126,7 +126,7 @@ function toJSON(e){
 	console.log("toJSON -> Id: "+e.attr('id')+" Type: "+e.attr("type")+ " TagName: "+e.prop('tagName') +" Converter:"+e.attr("converter"));
 	var converterFunction = e.attr("converter");
 	var json = {};
-	if(converterFunction){
+	if(converterFunction){	
 		var converter = eval("new "+converterFunction+"();");
 		json[e.attr('id')] = converter.serialize(e);
 	}else{
@@ -137,11 +137,6 @@ function toJSON(e){
 		console.log("to JSON -> Childen's JSON: "+JSON.stringify(json));
 	}
 	return json;
-}
-(function ($) {
-    $.serialize = function (options) {
-		return toJSON(this);
-	}	
 }
 function getDefaultConverter(e,val){
 	var tag = e.prop('tagName');
@@ -171,3 +166,9 @@ function getDefaultConverter(e,val){
 function getText(val){
 	return (typeof(val)=='object')?JSON.stringify(val):val;
 }
+$.fn.serialize = function (options) {
+		return toJSON(this);
+}
+$.fn.deserialize = function (val,options) {
+		return fillElement(this,val);
+}	
